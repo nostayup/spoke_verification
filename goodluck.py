@@ -11,7 +11,7 @@ import librosa.display
 import os
 from keras import backend as K
 import numpy as np
-
+from PIL import Image
 
 audio_path = './database/recordings/'
 names = os.listdir(audio_path)
@@ -51,6 +51,10 @@ def savepic_mel(i):
     Xdb -= np.mean(Xdb, keepdims=True)
     Xdb /= np.std(Xdb, keepdims=True) + K.epsilon()
     plt.imsave('./spectrograms/'+ names[i].split('.')[0] + '.jpg',Xdb)
+    img = Image.open('./spectrograms/'+ names[i].split('.')[0] + '.jpg')
+    img = img.resize((64,128))
+    img.save('./spectrograms/'+ names[i].split('.')[0] + '.png')
+    
 
 
 
