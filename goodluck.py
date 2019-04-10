@@ -12,9 +12,11 @@ import os
 from keras import backend as K
 import numpy as np
 from PIL import Image
+from tqdm import tqdm
 
 audio_path = './database/recordings/'
 names = os.listdir(audio_path)
+pic_path = './database/spectrograms/'
 
 #显示波形
 def waveplot(i):
@@ -44,18 +46,19 @@ def melplot(i):
 def savepic_mel(i):
     x , sr = librosa.load(audio_path + names[i])
     X = librosa.feature.melspectrogram(x, n_mels=128,hop_length = 256)
-    print(X.shape)
+#    print(X.shape)
     Xdb = librosa.amplitude_to_db(abs(X))
-    print(Xdb.shape)
+#    print(Xdb.shape)
     plt.figure(figsize=(7, 3))
     Xdb -= np.mean(Xdb, keepdims=True)
     Xdb /= np.std(Xdb, keepdims=True) + K.epsilon()
-    plt.imsave('./spectrograms/'+ names[i].split('.')[0] + '.jpg',Xdb)
-    img = Image.open('./spectrograms/'+ names[i].split('.')[0] + '.jpg')
+    plt.imsave(pic_path+ names[i].split('.')[0] + '.jpg',Xdb)
+    img = Image.open(pic_path+ names[i].split('.')[0] + '.jpg')
     img = img.resize((64,128))
-    img.save('./spectrograms/'+ names[i].split('.')[0] + '.png')
+    img.save(pic_path+ names[i].split('.')[0] + '.png')
     
-
+for i in tqdm(range(len(names))):
+    savepic_mel(i)
 
 
 
