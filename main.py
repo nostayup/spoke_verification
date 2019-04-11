@@ -12,6 +12,7 @@ from keras import backend as K
 import numpy as np
 import random
 from PIL import Image
+import keras
 from keras.preprocessing.image import img_to_array
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
@@ -72,38 +73,38 @@ class TrainingData(Sequence):
         return img
 
     def __len__(self):
-        return len(self.data) // self.batch_size
+        return len(self.data) // self.batch_size + 1
 
 def VGG_16():
     model = Sequential()
 
     # BLOCK 1
-    model.add(Conv2D(filters= 32, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block1_conv1', input_shape = (224, 224,3)))   
-    model.add(Conv2D(filters= 32, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block1_conv2'))
+    model.add(Conv2D(filters= 64, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block1_conv1', input_shape = (128, 64,3)))   
+    model.add(Conv2D(filters= 64, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block1_conv2'))
     model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block1_pool'))
  
     # BLOCK2
-    model.add(Conv2D(filters= 64, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block2_conv1'))   
-    model.add(Conv2D(filters= 64, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block2_conv2'))
+    model.add(Conv2D(filters= 128, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block2_conv1'))   
+    model.add(Conv2D(filters= 128, kernel_size=(3, 3), activation = 'relu', padding = 'same', name = 'block2_conv2'))
     model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block2_pool'))
  
     # BLOCK3
-    model.add(Conv2D(filters= 128, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block3_conv2'))
-    model.add(Conv2D(filters= 128, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block3_conv3'))
+    model.add(Conv2D(filters= 256, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block3_conv2'))
+    model.add(Conv2D(filters= 256, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block3_conv3'))
     model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block3_pool'))
  
     # BLOCK4
-    model.add(Conv2D(filters= 256, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block4_conv2'))
-    model.add(Conv2D(filters= 256, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block4_conv3'))
+    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block4_conv2'))
+    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block4_conv3'))
     model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block4_pool'))
  
     # BLOCK5
-    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block5_conv2'))
-    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block5_conv3'))
-    model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block5_pool'))
+#    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block5_conv2'))
+#    model.add(Conv2D(filters= 512, kernel_size = (3, 3), activation = 'relu', padding = 'same', name = 'block5_conv3'))
+#    model.add(MaxPooling2D(pool_size = (2, 2), strides = (2, 2), name = 'block5_pool'))
 
     model.add(Flatten())
-    model.add(Dense(1024, activation = 'relu', name = 'fc1'))
+    model.add(Dense(512, activation = 'relu', name = 'fc1'))
     model.add(Dropout(0.5))
     model.add(Dense(4, activation = 'softmax', name = 'prediction'))
     
@@ -113,6 +114,22 @@ def VGG_16():
     
     return model
 
+model = VGG_16()
+
+'''
+命令行里面输入：
+tensorboard --logdir ./graph
+'''
+tbCallBack = keras.callbacks.TensorBoard(log_dir='./graph', 
+                                         histogram_freq= 0, 
+                                         write_graph=True, 
+                                         write_images=True)
+
+history = model.fit_generator(TrainingData(train_pic),
+                              verbose=1,
+                              epochs=50,
+                              validation_data=TrainingData(val_pic),
+                              callbacks=[tbCallBack])
 
 
 
