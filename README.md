@@ -5,4 +5,4 @@
 `main.py`
 模型训练
 
-Data set referred: [https://github.com/Jakobovski/free-spoken-digit-dataset/tree/master/recordings]
+Data set referred: https://github.com/Jakobovski/free-spoken-digit-dataset/tree/master/recordings
